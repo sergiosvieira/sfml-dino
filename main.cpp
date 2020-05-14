@@ -39,6 +39,7 @@ void loop(RenderWindow& window,
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
+
         }
         elapsed += clock.restart();
         while (elapsed >= kUpdateMs) {
@@ -64,9 +65,9 @@ class Animate {
     Time updateTime;
     Texture tex;
     Sprite sprite;
-    int start = 0; // first sprite
-    int end = 1; // last sprite
-    int current = 1; // current sprite
+    int start; // first sprite
+    int end; // last sprite
+    int current; // current sprite
     Vector2i irect = {0, 0};
 public:
     Animate (const std::string& filename,
@@ -75,10 +76,13 @@ public:
         tex.loadFromFile(filename);
         sprite.setTexture(tex);
     }
+    void setCurrentFrame(int value) {
+        current = value;
+    }
     void setPosition(float x, float y) {
         sprite.setPosition(x, y);
     }
-    const Sprite& getSprite() {
+    Sprite& getSprite() {
         return sprite;
     }
     void update() {
@@ -86,10 +90,18 @@ public:
         if (elapsed >= updateTime) {
             IntRect textureRect = {current * irect.x, 0, irect.x, irect.y};
             sprite.setTextureRect(textureRect);
-            if (current + 1 > end) current = start;
-            else ++current;
+            ++current;
+            if (current > end) current = start;
             elapsed -= updateTime;
         }
+    }
+};
+
+class Ground {
+    Texture tex;
+    Sprite sprite;
+    Ground() {
+        tex.loadFromFile("ground.png");
     }
 };
 
@@ -109,26 +121,60 @@ public:
 
 class Dino {
 public:
-    Animate animate{"dino-01.png", 1, 3, 1, {48, 45}, sf::seconds(1.f/15.)};
+    enum class State {Idle, Standing, Crouched, Jumping};
+    State currentState = State::Idle;
+    Time animateSpeed = sf::seconds(1.f/15.);
+    Animate standAnimate{"dino-01.png", 1, 3, 1, {48, 45}, animateSpeed};
+    Animate crounchAnimate{"dino-02.png", 0, 1, 0, {57, 28}, animateSpeed};
     Dino() {
+        idleState();
+    }
+    void idleState() {
+        currentState = State::Idle;
+        standAnimate.setCurrentFrame(0);
+        standAnimate.getSprite().setTextureRect({0, 0, 48, 45});
+    }
+    void JumpState() {
+        currentState = State::Jumping;
+        standAnimate.setCurrentFrame(1);
+        standAnimate.getSprite().setTextureRect({48, 0, 48, 45});
+    }
+    void setPosition(float x, float y) {
+        standAnimate.setPosition(x, y);
+        crounchAnimate.setPosition(x, y);
     }
     void update(float dt) {
-
     }
     void render(RenderWindow& rw) {
-        animate.update();
-        rw.draw(animate.getSprite());
+        static const std::set<State> states = {
+          State::Standing,
+          State::Crouched
+        };
+        if (currentState == State::Standing) {
+            standAnimate.update();
+        } else if (currentState == State::Crouched) {
+            crounchAnimate.update();
+        } else if (currentState == State::Idle) {
+            idleState();
+        } else if (currentState == State::Jumping) {
+            JumpState();
+        }
+        if (currentState != State::Crouched) {
+            rw.draw(standAnimate.getSprite());
+        } else {
+            rw.draw(crounchAnimate.getSprite());
+        }
     }
 };
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(kWidth, kHeight), "Dino Game");
     Dino p1;
-    p1.animate.setPosition(kWidth/2.f, kHeight/2.f);
+    p1.setPosition(kWidth/2.f, kHeight/2.f);
     Pterodactyl ptero;
     ptero.animate.setPosition(10.f, 10.f);
     Update update = [&](float dt) {
-        p1.update(dt);
+        //p1.update(dt);
     };
     Draw draw = [&](RenderWindow& rw) {
         p1.render(rw);
