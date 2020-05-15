@@ -60,13 +60,6 @@ void loop(RenderWindow& window,
     }
 }
 
-void print(const IntRect& rect) {
-    std::cout << "{" << rect.top << ", "
-              << rect.left << ", "
-              << rect.width << ", "
-              << rect.height << "}" << std::endl;
-}
-
 class Animate {
     Clock clock;
     Time elapsed;
@@ -143,6 +136,8 @@ public:
 
 class Dino {
 public:
+    Vector2f vel = {0.f, 200.f};
+    Vector2f gra = {0.f, -450.f};
     enum class State {Idle, Standing, Crouched, Jumping};
     State currentState = State::Idle;
     Time animateSpeed = sf::seconds(1.f/15.);
@@ -150,6 +145,17 @@ public:
     Animate crounchAnimate{"dino-02.png", 0, 1, 0, {57, 45}, animateSpeed};
     Dino() {
         idleState();
+    }
+    void printState() {
+        if (currentState == State::Idle) {
+            std::cout << "Idle\n";
+        } else if (currentState == State::Standing) {
+            std::cout << "Standing\n";
+        } else if (currentState == State::Crouched) {
+            std::cout << "Crouched\n";
+        } else if (currentState == State::Jumping) {
+            std::cout << "Jumping\n";
+        }
     }
     void idleState() {
         currentState = State::Idle;
@@ -166,6 +172,17 @@ public:
         crounchAnimate.setPosition(x, y);
     }
     void update(float dt) {
+        if (currentState == State::Jumping) {
+            Vector2f pos = standAnimate.getSprite().getPosition();
+            pos.y -= vel.y * dt;
+            vel += gra * dt;
+            if (pos.y > 317.f) {
+                pos.y = 317.f;
+                currentState = State::Standing;
+                vel = {0.f, 200.f};
+            }
+            setPosition(pos.x, pos.y);
+        }
     }
     void render(RenderWindow& rw) {        
         static const std::set<State> states = {
@@ -188,14 +205,20 @@ public:
         }
     }
     void keyPressed(sf::Event::KeyEvent& key) {
-        if (key.code == sf::Keyboard::Up) {
-            currentState = State::Jumping;
-        } else if (key.code == sf::Keyboard::Down) {
-            currentState = State::Crouched;
+        if (currentState != State::Jumping)
+        {
+            if (key.code == sf::Keyboard::Up) {
+                currentState = State::Jumping;
+            } else if (key.code == sf::Keyboard::Down) {
+                currentState = State::Crouched;
+            }
         }
     }
     void keyReleased() {
-        currentState = State::Standing;
+        if (currentState != State::Jumping)
+        {
+            currentState = State::Standing;
+        }
     }
 };
 
@@ -207,7 +230,7 @@ int main() {
     Pterodactyl ptero;
     ptero.animate.setPosition(10.f, 10.f);
     Update update = [&](float dt) {
-        //p1.update(dt);
+        p1.update(dt);
         ground.update(dt);
     };
     Draw draw = [&](RenderWindow& rw) {
