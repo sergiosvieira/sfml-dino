@@ -27,19 +27,27 @@ using sf::RenderWindow,
 
 using Draw = std::function<void(RenderWindow&)>;
 using Update = std::function<void(float)>;
+using KeyPressed = std::function<void(sf::Event::KeyEvent&)>;
+using KeyReleased = std::function<void()>;
 
 void loop(RenderWindow& window,
           Update update = nullptr,
-          Draw draw = nullptr) {
+          Draw draw = nullptr,
+          KeyPressed keypressed = nullptr,
+          KeyReleased keyreleased = nullptr) {
     Clock clock;
     Time elapsed = clock.restart();
     while (window.isOpen())
     {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 window.close();
-
+            } else if (event.type == sf::Event::KeyPressed) {
+                if (keypressed != nullptr) keypressed(event.key);
+            } else if (event.type == sf::Event::KeyReleased) {
+                if (keyreleased != nullptr) keyreleased();
+            }
         }
         elapsed += clock.restart();
         while (elapsed >= kUpdateMs) {
@@ -102,6 +110,13 @@ class Ground {
     Sprite sprite;
     Ground() {
         tex.loadFromFile("ground.png");
+        sprite.setTexture(tex);
+    }
+    void update(float dt) {
+        
+    }
+    void render() {
+        
     }
 };
 
@@ -124,8 +139,8 @@ public:
     enum class State {Idle, Standing, Crouched, Jumping};
     State currentState = State::Idle;
     Time animateSpeed = sf::seconds(1.f/15.);
-    Animate standAnimate{"dino-01.png", 1, 3, 1, {48, 45}, animateSpeed};
-    Animate crounchAnimate{"dino-02.png", 0, 1, 0, {57, 28}, animateSpeed};
+    Animate standAnimate{"dino-01.png", 2, 3, 1, {48, 45}, animateSpeed};
+    Animate crounchAnimate{"dino-02.png", 0, 1, 0, {57, 45}, animateSpeed};
     Dino() {
         idleState();
     }
@@ -145,7 +160,7 @@ public:
     }
     void update(float dt) {
     }
-    void render(RenderWindow& rw) {
+    void render(RenderWindow& rw) {        
         static const std::set<State> states = {
           State::Standing,
           State::Crouched
@@ -165,6 +180,16 @@ public:
             rw.draw(crounchAnimate.getSprite());
         }
     }
+    void keyPressed(sf::Event::KeyEvent& key) {
+        if (key.code == sf::Keyboard::Up) {
+            currentState = State::Jumping;
+        } else if (key.code == sf::Keyboard::Down) {
+            currentState = State::Crouched;
+        }
+    }
+    void keyReleased() {
+        currentState = State::Standing;
+    }
 };
 
 int main() {
@@ -180,6 +205,12 @@ int main() {
         p1.render(rw);
         ptero.render(rw);
     };
-    loop(window, update, draw);
+    KeyPressed keyp = [&](sf::Event::KeyEvent& k) {
+        p1.keyPressed(k);
+    };
+    KeyReleased keyr = [&]() {
+        p1.keyReleased();
+    };
+    loop(window, update, draw, keyp, keyr);
     return 0;
 }
