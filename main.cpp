@@ -5,8 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-static const int kWidth = 800;
-static const int kHeight = 480;
+static const int kWidth = 600;
+static const int kHeight = 400;
 static const int kFPS = 30;
 static const sf::Time kUpdateMs = sf::seconds(1.f/static_cast<float>(kFPS));
 
@@ -108,15 +108,22 @@ public:
 class Ground {
     Texture tex;
     Sprite sprite;
+    Vector2f pos = {0, kHeight - 50.f};
+    float speed = 250.f;
+public:
     Ground() {
         tex.loadFromFile("ground.png");
         sprite.setTexture(tex);
+        sprite.setTextureRect({0, 0, 1200, 12});
+        sprite.setPosition(0, kHeight - 50);
     }
     void update(float dt) {
-        
+        pos.x -= speed * dt;
+        if (pos.x < -600.f) pos.x = 0.f;
+        sprite.setPosition(pos);
     }
-    void render() {
-        
+    void render(RenderWindow& rw) {
+        rw.draw(sprite);
     }
 };
 
@@ -194,14 +201,17 @@ public:
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(kWidth, kHeight), "Dino Game");
+    Ground ground;
     Dino p1;
-    p1.setPosition(kWidth/2.f, kHeight/2.f);
+    p1.setPosition(50, 317);
     Pterodactyl ptero;
     ptero.animate.setPosition(10.f, 10.f);
     Update update = [&](float dt) {
         //p1.update(dt);
+        ground.update(dt);
     };
     Draw draw = [&](RenderWindow& rw) {
+        ground.render(rw);
         p1.render(rw);
         ptero.render(rw);
     };
