@@ -148,12 +148,24 @@ public:
 };
 
 class Pterodactyl {
+    float speed = 200.f;
+    Vector2f pos = {kWidth, kHeight - 85.f};
 public:
     Animate animate{"ptero.png", 0, 1, 0, {46, 35}, sf::seconds(1.f/5.f)};
     Pterodactyl() {
+        animate.getSprite().setPosition(pos);
     }
     void update(float dt) {
-
+        pos.x -= speed * dt;
+        if (pos.x + 46.f < 0.f) {
+            pos.x = kWidth;
+            if (urd(mt) > 1.) {
+                pos.y = kHeight - 115.f;
+            } else {
+                pos.y = kHeight - 85.f;
+            }
+        }
+        animate.getSprite().setPosition(pos);
     }
     void render(RenderWindow& rw) {
         animate.update();
@@ -164,7 +176,7 @@ public:
 class Dino {
 public:
     Vector2f vel = {0.f, 200.f};
-    Vector2f gra = {0.f, -450.f};
+    Vector2f gra = {0.f, -380.f};
     enum class State {Idle, Standing, Crouched, Jumping};
     State currentState = State::Idle;
     Time animateSpeed = sf::seconds(1.f/15.);
@@ -258,6 +270,7 @@ int main() {
     ptero.animate.setPosition(10.f, 10.f);
     Update update = [&](float dt) {
         p1.update(dt);
+        ptero.update(dt);
         ground.update(dt);
     };
     Draw draw = [&](RenderWindow& rw) {
