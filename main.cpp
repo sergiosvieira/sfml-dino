@@ -4,11 +4,15 @@
 #include <memory>
 #include <iostream>
 #include <cmath>
+#include <random>
 
 static const int kWidth = 600;
 static const int kHeight = 400;
 static const int kFPS = 30;
 static const sf::Time kUpdateMs = sf::seconds(1.f/static_cast<float>(kFPS));
+static std::random_device rd;
+static std::mt19937 mt(rd());
+static std::uniform_real_distribution<double> urd(0., 3.);
 
 using sf::RenderWindow,
     sf::VideoMode,
@@ -99,24 +103,47 @@ public:
 };
 
 class Ground {
-    Texture tex;
-    Sprite sprite;
+    Texture tex, texTiles;
+    Sprite sprite, spriteTiles;
     Vector2f pos = {0, kHeight - 50.f};
+    Vector2f tilePos = {kWidth, kHeight - 50.f};
+    Vector2i tileSize = {25, 12};
     float speed = 250.f;
+    bool showTileGround = false;
 public:
     Ground() {
         tex.loadFromFile("ground.png");
         sprite.setTexture(tex);
         sprite.setTextureRect({0, 0, 1200, 12});
         sprite.setPosition(0, kHeight - 50);
+        texTiles.loadFromFile("tile-ground.png");
+        spriteTiles.setTexture(texTiles);
+        spriteTiles.setTextureRect({0, 0, tileSize.x, tileSize.y});
+        spriteTiles.setPosition(tilePos);
     }
     void update(float dt) {
         pos.x -= speed * dt;
-        if (pos.x < -600.f) pos.x = 0.f;
+        if (pos.x < -600.f) {
+            pos.x = 0.f;
+            showTileGround = true;
+            int rx = urd(mt);
+            int rw = urd(mt) + 1;
+            spriteTiles.setTextureRect({rx * tileSize.x, 0,
+                                        rw * tileSize.x, tileSize.y});
+        }
         sprite.setPosition(pos);
+        if (showTileGround) {
+            tilePos.x -= speed * dt;
+            if (tilePos.x + spriteTiles.getTextureRect().width < 0) {
+                tilePos.x = kWidth;
+                showTileGround = false;
+            }
+            spriteTiles.setPosition(tilePos);
+        }
     }
     void render(RenderWindow& rw) {
         rw.draw(sprite);
+        rw.draw(spriteTiles);
     }
 };
 
