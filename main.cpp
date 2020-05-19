@@ -147,6 +147,35 @@ public:
     }
 };
 
+class Cactus {
+    Texture smallTex, bigTex;
+    Sprite smallSprite, bigSprite;
+    bool showBig = true;
+    Vector2f bigPos = {kWidth, 317};
+    Vector2i bigRect {25, 50};
+    float speed = 250.f;
+public:
+    Cactus() {
+        smallTex.loadFromFile("cactus-small.png");
+        bigTex.loadFromFile("cactus-big.png");
+        smallSprite.setTexture(smallTex);
+        bigSprite.setTexture(bigTex);
+        bigSprite.setTextureRect({0, 0, bigRect.x, bigRect.y});
+    }
+    void update(float dt) {
+        bigPos.x -= speed * dt;
+        if (bigPos.x + 25.f < 0.f) bigPos.x = kWidth;
+        bigSprite.setPosition(bigPos);
+    }
+    void render(RenderWindow& rw) {
+        if (showBig) {
+            rw.draw(bigSprite);
+        } else {
+            rw.draw(smallSprite);
+        }
+    }
+};
+
 class Pterodactyl {
     float speed = 200.f;
     Vector2f pos = {kWidth, kHeight - 85.f};
@@ -264,6 +293,7 @@ public:
 int main() {
     sf::RenderWindow window(sf::VideoMode(kWidth, kHeight), "Dino Game");
     Ground ground;
+    Cactus cactus;
     Dino p1;
     p1.setPosition(50, 317);
     Pterodactyl ptero;
@@ -272,9 +302,11 @@ int main() {
         p1.update(dt);
         ptero.update(dt);
         ground.update(dt);
+        cactus.update(dt);
     };
     Draw draw = [&](RenderWindow& rw) {
         ground.render(rw);
+        cactus.render(rw);
         p1.render(rw);
         ptero.render(rw);
     };
