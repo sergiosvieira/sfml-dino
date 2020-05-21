@@ -202,6 +202,36 @@ public:
     }
 };
 
+class Clouds {
+    Texture tex;
+    Sprite sprite;
+    Vector2f pos = {kWidth, kHeight - 215.f};
+    Vector2i size = {46, 13};
+    float speed = 200.f;
+public:
+    Clouds() {
+        tex.loadFromFile("cloud.png");
+        sprite.setTexture(tex);
+        sprite.setTextureRect({0, 0, size.x, size.y});
+    }
+    void update(float dt) {
+        pos.x -= speed * dt;
+        if (pos.x + 46.f < 0.f) {
+            pos.x = kWidth;
+            if (urd(mt) > 1.) {
+                pos.y = kHeight - 215.f;
+            } else {
+                pos.y = kHeight - 210.f;
+            }
+        }
+        sprite.setPosition(pos);
+    }
+    void render(RenderWindow& rw) {
+        rw.draw(sprite);
+    }
+
+};
+
 class Dino {
 public:
     Vector2f vel = {0.f, 200.f};
@@ -292,6 +322,7 @@ public:
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(kWidth, kHeight), "Dino Game");
+    Clouds c1;
     Ground ground;
     Cactus cactus;
     Dino p1;
@@ -300,11 +331,13 @@ int main() {
     ptero.animate.setPosition(10.f, 10.f);
     Update update = [&](float dt) {
         p1.update(dt);
+        c1.update(dt);
         ptero.update(dt);
         ground.update(dt);
         cactus.update(dt);
     };
     Draw draw = [&](RenderWindow& rw) {
+        c1.render(rw);
         ground.render(rw);
         cactus.render(rw);
         p1.render(rw);
