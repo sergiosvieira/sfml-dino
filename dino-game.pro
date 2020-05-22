@@ -2,7 +2,27 @@ TEMPLATE = app
 CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
-LIBS += -L"/usr/lib64"
+INCLUDEPATH += "/usr/local/opt/sfml/include"
+LIBS += -L"/usr/local/opt/sfml/lib"
 LIBS += -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-window -lsfml-system
 SOURCES += \
-        main.cpp
+        animation.cpp \
+        cactus.cpp \
+        cloud.cpp \
+        frame.cpp \
+        ground.cpp \
+        main.cpp \
+        player.cpp \
+        pterodactyl.cpp
+
+HEADERS += \
+    animation.h \
+    cactus.h \
+    cloud.h \
+    frame.h \
+    game-consts.h \
+    game-random.h \
+    ground.h \
+    object.h \
+    player.h \
+    pterodactyl.h
