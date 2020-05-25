@@ -44,7 +44,7 @@ public:
      * @brief getRect
      * @return
      */
-    IntRect getRect() const;
+    IntRect getRect();
     /**
      * @brief setCurrentFrame
      * @param current
@@ -54,6 +54,10 @@ public:
      * @brief update
      */
     void update();
+    /**
+     * @brief updateRect
+     */
+    void updateRect();
 };
 
 #endif // FRAME_H

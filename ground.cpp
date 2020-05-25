@@ -4,7 +4,9 @@ Ground::Ground() {
     texture.loadFromFile("ground.png");
     sprite.setTexture(texture);
     sprite.setTextureRect({0, 0, 1200, 12});
-    sprite.setPosition(0, kHeight - 50);
+    pos = {0.f, kHeight - 50.f};
+    sprite.setPosition(pos);
+    speed = 200.f;
 }
 
 void Ground::update(float dt) {
@@ -17,5 +19,4 @@ void Ground::update(float dt) {
 
 void Ground::render(RenderWindow& rw) {
     rw.draw(sprite);
-
 }

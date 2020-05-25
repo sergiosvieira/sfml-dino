@@ -6,7 +6,7 @@ Frame::Frame(int start,
              const IntRect& rect): start(start),
                                    end(end),
                                    current(current),
-                                   rect(rect){
+                                   rect(rect) {
 
 }
 
@@ -22,8 +22,15 @@ int Frame::getCurrent() const {
     return this->current;
 }
 
-IntRect Frame::getRect() const {
+IntRect Frame::getRect() {
     return this->rect;
+}
+
+void Frame::updateRect() {
+    this->rect = {this->current * this->rect.width,
+                  this->rect.top,
+                  this->rect.width,
+                  this->rect.height};
 }
 
 void Frame::setCurrentFrame(int current) {
@@ -31,9 +38,9 @@ void Frame::setCurrentFrame(int current) {
 }
 
 void Frame::update() {
-    if (this->current + 1 > this->end) this->current = this->start;
-    this->rect = {this->current * this->rect.width,
-                  this->rect.top,
-                  this->rect.width,
-                  this->rect.height};
+    if (this->current + 1 > this->end) {
+        this->current = this->start;
+    } else {
+        ++current;
+    }
 }

@@ -8,6 +8,14 @@ Animation::Animation (const std::string& filename,
     this->sprite.setTexture(tex);
 }
 
+void Animation::setFreeze(bool value) {
+    this->freeze = value;
+}
+
+bool Animation::getFreeze() const {
+    return this->freeze;
+}
+
 Sprite& Animation::getSprite() {
     return this->sprite;
 }
@@ -19,7 +27,8 @@ Frame& Animation::getFrame() {
 void Animation::update() {
     this->elapsed += this->clock.restart();
     if (this->elapsed >= this->updateTime) {
-        this->frame.update();
+        if (!freeze) this->frame.update();
+        this->frame.updateRect();
         this->sprite.setTextureRect(this->frame.getRect());
         this->elapsed -= this->updateTime;
     }

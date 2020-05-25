@@ -28,7 +28,7 @@ public:
      * @brief setPosition
      * @param pos
      */
-    void setPosition(const Vector2f& pos) {
+    virtual void setPosition(const Vector2f& pos) {
         this->pos = pos;
     }
     /**

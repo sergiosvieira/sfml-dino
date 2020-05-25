@@ -5,7 +5,7 @@
 
 Pterodactyl::Pterodactyl() {
     this->setSpeed(200);
-    this->setPosition({kWidth, kHeight - 85.f});
+    this->setPosition({kWidth, kHeight - 73.f});
 }
 
 void Pterodactyl::update(float dt) {
@@ -13,9 +13,9 @@ void Pterodactyl::update(float dt) {
     if (pos.x + 46.f < 0.f) {
         pos.x = kWidth;
         if (urd(mt) > 1.) {
-            pos.y = kHeight - 115.f;
+            pos.y = kHeight - 103.f;
         } else {
-            pos.y = kHeight - 85.f;
+            pos.y = kHeight - 73.f;
         }
     }
     animation.getSprite().setPosition(pos);

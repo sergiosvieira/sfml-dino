@@ -21,6 +21,7 @@ class Animation {
     Texture tex;
     Sprite sprite;
     Frame frame;
+    bool freeze = false;
 public:
     /**
      * @brief Animation - Cuida da animação dos sprites
@@ -45,6 +46,16 @@ public:
      * @brief update - Atualiza a posição do próximo frame que será exibido na tela
      */
     void update();
+    /**
+     * @brief setFreeze
+     * @param value
+     */
+    void setFreeze(bool value);
+    /**
+     * @brief getFreeze
+     * @return
+     */
+    bool getFreeze() const;
 };
 
 

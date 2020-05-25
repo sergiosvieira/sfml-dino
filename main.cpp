@@ -11,6 +11,8 @@
 #include "pterodactyl.h"
 #include "ground.h"
 #include "cloud.h"
+#include "cactus.h"
+#include "player.h"
 
 using sf::RenderWindow,
     sf::VideoMode,
@@ -27,14 +29,14 @@ using sf::RenderWindow,
     sf::Sprite,
     sf::Vector2i;
 
-using Draw = std::function<void(RenderWindow&)>;
+using Render = std::function<void(RenderWindow&)>;
 using Update = std::function<void(float)>;
 using KeyPressed = std::function<void(sf::Event::KeyEvent&)>;
 using KeyReleased = std::function<void()>;
 
 void loop(RenderWindow& window,
           Update update = nullptr,
-          Draw draw = nullptr,
+          Render render = nullptr,
           KeyPressed keypressed = nullptr,
           KeyReleased keyreleased = nullptr) {
     Clock clock;
@@ -57,7 +59,7 @@ void loop(RenderWindow& window,
             elapsed -= kUpdateMs;
         }
         window.clear({247, 247, 247, 255});
-        if (draw) draw(window);
+        if (render) render(window);
         window.display();
     }
 }
@@ -66,24 +68,23 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(kWidth, kHeight), "Dino Game");
     Cloud c1;
     Ground ground;
-    Cactus cactus;
+    Cactus smallCactus{"cactus-small.png", {0, 0, 17, 35}};
+    Cactus bigCactus{"cactus-big.small", {0, 0, 25, 50}};
     Player p1;
-    p1.setPosition(50, 317);
     Pterodactyl ptero;
-    ptero.setPosition(10.f, 10.f);
     Update update = [&](float dt) {
-        p1.update(dt);
         c1.update(dt);
-        ptero.update(dt);
         ground.update(dt);
-        cactus.update(dt);
+        smallCactus.update(dt);
+        ptero.update(dt);
+        p1.update(dt);
     };
-    Draw draw = [&](RenderWindow& rw) {
+    Render render = [&](RenderWindow& rw) {
         c1.render(rw);
         ground.render(rw);
-        cactus.render(rw);
-        p1.render(rw);
+        smallCactus.render(rw);
         ptero.render(rw);
+        p1.render(rw);
     };
     KeyPressed keyp = [&](sf::Event::KeyEvent& k) {
         p1.keyPressed(k);
@@ -91,6 +92,6 @@ int main() {
     KeyReleased keyr = [&]() {
         p1.keyReleased();
     };
-    loop(window, update, draw, keyp, keyr);
+    loop(window, update, render, keyp, keyr);
     return 0;
 }
