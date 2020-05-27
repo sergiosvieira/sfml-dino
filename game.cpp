@@ -35,33 +35,33 @@ Game::Game() {
     };
     normalEvents = {
         {EventType::None, sf::seconds(1)},
-        {EventType::BigCactus, sf::seconds(2)},
-        {EventType::BigCactus, sf::seconds(2)},
-        {EventType::Pterodactyl, sf::seconds(2)},
-        {EventType::Pterodactyl, sf::seconds(2)},
-        {EventType::BigCactus, sf::seconds(2)},
-        {EventType::SmallCactus, sf::seconds(2)},
+        {EventType::BigCactus, sf::seconds(1.3)},
+        {EventType::BigCactus, sf::seconds(1.4)},
+        {EventType::Pterodactyl, sf::seconds(1.5)},
+        {EventType::Pterodactyl, sf::seconds(0.9)},
+        {EventType::BigCactus, sf::seconds(0.9)},
+        {EventType::SmallCactus, sf::seconds(1.1)},
     };
     hardEvents = {
         {EventType::None, sf::seconds(1)},
-        {EventType::SmallCactus, sf::seconds(2)},
-        {EventType::SmallCactus, sf::seconds(2)},
-        {EventType::Pterodactyl, sf::seconds(2)},
-        {EventType::BigCactus, sf::seconds(2)},
-        {EventType::Pterodactyl, sf::seconds(2)},
-        {EventType::Pterodactyl, sf::seconds(2)},
-        {EventType::SmallCactus, sf::seconds(2)},
-        {EventType::BigCactus, sf::seconds(2)},
-        {EventType::BigCactus, sf::seconds(2)},
+        {EventType::SmallCactus, sf::seconds(1.1)},
+        {EventType::SmallCactus, sf::seconds(0.5)},
+        {EventType::Pterodactyl, sf::seconds(0.6)},
+        {EventType::BigCactus, sf::seconds(0.5)},
+        {EventType::Pterodactyl, sf::seconds(0.7)},
+        {EventType::Pterodactyl, sf::seconds(0.9)},
+        {EventType::SmallCactus, sf::seconds(0.5)},
+        {EventType::BigCactus, sf::seconds(0.9)},
+        {EventType::BigCactus, sf::seconds(1.1)},
     };
     hardestEvents = {
         {EventType::None, sf::seconds(1)},
-        {EventType::BigCactus, sf::seconds(2)},
-        {EventType::BigCactus, sf::seconds(2)},
-        {EventType::Pterodactyl, sf::seconds(2)},
-        {EventType::None, sf::seconds(1)},
+        {EventType::BigCactus, sf::seconds(0.8)},
+        {EventType::BigCactus, sf::seconds(0.9)},
+        {EventType::Pterodactyl, sf::seconds(0.7)},
+        {EventType::None, sf::seconds(0.9)},
         {EventType::SmallCactus, sf::seconds(1.5)},
-        {EventType::SmallCactus, sf::seconds(2)},
+        {EventType::SmallCactus, sf::seconds(0.5)},
         {EventType::Pterodactyl, sf::seconds(1)},
         {EventType::BigCactus, sf::seconds(1.)},
         {EventType::Pterodactyl, sf::seconds(0.5)},
@@ -77,11 +77,11 @@ Game::Game() {
         {EventType::BigCactus, sf::seconds(1.5)},
         {EventType::BigCactus, sf::seconds(1.8)},
         {EventType::None, sf::seconds(0.5)},
-        {EventType::SmallCactus, sf::seconds(2)},
-        {EventType::SmallCactus, sf::seconds(2)},
-        {EventType::Pterodactyl, sf::seconds(2)},
-        {EventType::None, sf::seconds(1)},
-        {EventType::SmallCactus, sf::seconds(2)},
+        {EventType::SmallCactus, sf::seconds(1.1)},
+        {EventType::SmallCactus, sf::seconds(0.6)},
+        {EventType::Pterodactyl, sf::seconds(1.2)},
+        {EventType::None, sf::seconds(0.5)},
+        {EventType::SmallCactus, sf::seconds(0.2)},
     };
     initGameLevel();
     font.loadFromFile("atari.ttf");
@@ -96,13 +96,21 @@ Game::Game() {
 
 void Game::initGameLevel() {
     if (level == Level::Easy) {
+        gameSpeed = 300.f;
         init(easyEvents);
     } else if (level == Level::Normal) {
+        gameSpeed = 350.f;
         init(normalEvents);
     } else if (level == Level::Hard) {
+        gameSpeed = 400.f;
         init(hardEvents);
     } else if (level == Level::Hardest) {
+        gameSpeed = 450.f;
         init(hardestEvents);
+    }
+    ground.setSpeed(gameSpeed);
+    for (auto c: clouds) {
+        c->setSpeed(gameSpeed);
     }
 }
 
@@ -129,7 +137,8 @@ void Game::render(sf::RenderWindow& rw) {
     /** Início - Controle de Pontuação **/
     pointElapsed += pointClock.restart();
     while (pointElapsed > pointWait) {
-        ++points;
+        //++points;
+        points += 10;
         if (points % 100 == 0) {
             blinkPoints = points;
             blinking = true;
@@ -150,6 +159,10 @@ void Game::render(sf::RenderWindow& rw) {
         }
     }
     /** Fim - Controle de Pontuação **/
+    // Controle do nível de Dificuldade do Jogo
+    if (points > 500 && points < 1000) level = Level::Normal;
+    else if (points > 1000 && points < 5000) level = Level::Hard;
+    else if (points > 5000) level = Level::Hardest;
     text.setString(ss.str());
     if (showTextScore) rw.draw(text);
 }
@@ -189,12 +202,14 @@ void Game::update(float dt) {
 }
 
 PtrObject Game::process(const GameEvent& event) {
+    PtrObject object = nullptr;
     if (event.type == EventType::SmallCactus) {
-        return PtrObject(new Cactus("cactus-small.png", {0, 0, 17, 35}, 327.f));
+         object = PtrObject(new Cactus("cactus-small.png", {0, 0, 17, 35}, 327.f));
     } else if (event.type == EventType::BigCactus) {
-        return PtrObject(new Cactus("cactus-big.png", {0, 0, 25, 50}, 315.f));
+        object = PtrObject(new Cactus("cactus-big.png", {0, 0, 25, 50}, 315.f));
     } else if (event.type == EventType::Pterodactyl) {
-        return PtrObject(new Pterodactyl());
+        object = PtrObject(new Pterodactyl());
     }
-    return nullptr;
+    object->setSpeed(gameSpeed);
+    return object;
 }

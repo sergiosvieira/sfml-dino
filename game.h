@@ -23,6 +23,7 @@ using Queue = std::deque<GameEvent>;
  * @brief The Game class
  */
 class Game {
+    float gameSpeed = 250.f;
     int blinkCount = 0;
     bool showTextScore = true;
     bool blinking = false;
