@@ -25,8 +25,10 @@ using Queue = std::deque<GameEvent>;
 class Game {
     enum class Level {Easy, Normal, Hard, Hardest};
     Level level = Level::Easy;
-    sf::Clock clock;
+    sf::Clock clock, pointClock;
     sf::Time currentTime = clock.restart();
+    sf::Time pointElapsed = pointClock.restart();
+    sf::Time pointWait = sf::seconds(1.f/7.f);
     VectorObject clouds;
     PtrObject pterodactyl;
     VectorEvents easyEvents;
@@ -36,6 +38,9 @@ class Game {
     Queue queue;
     VectorObject activatedObjects;
     Ground ground;
+    sf::Font font;
+    sf::Text text;
+    unsigned int points = 0;
     /**
      * @brief init
      * @param events

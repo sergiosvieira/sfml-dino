@@ -1,6 +1,8 @@
 #include "game.h"
 
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include "cloud.h"
 #include "pterodactyl.h"
 #include "cactus.h"
@@ -81,6 +83,15 @@ Game::Game() {
         {EventType::SmallCactus, sf::seconds(2)},
     };
     initGameLevel();
+    font.loadFromFile("atari.ttf");
+    text.setFont(font);
+    std::ostringstream ss;
+    ss << std::setw(5) << std::setfill('0') << points << "\n";
+    //std::string str = std::string(5, '0').append(std::to_string(points));
+    text.setString(ss.str());
+    text.setPosition(kWidth - 100.f, 10.f);
+    text.setFillColor(sf::Color(35, 35, 35));
+    text.setCharacterSize(15);
 }
 
 void Game::initGameLevel() {
@@ -109,9 +120,18 @@ void Game::render(sf::RenderWindow& rw) {
     for (auto object: activatedObjects) {
         object->render(rw);
     }
+    std::ostringstream ss;
+    ss << std::setw(5) << std::setfill('0') << points << "\n";
+    text.setString(ss.str());
+    rw.draw(text);
 }
 
 void Game::update(float dt) {
+    pointElapsed += pointClock.restart();
+    if (pointElapsed > pointWait) {
+        ++points;
+        pointElapsed -= pointWait;
+    }
     for (auto c: clouds) {
         c->update(dt);
     }

@@ -13,7 +13,7 @@ class Player : public Object
     enum class State {Idle, Stand, Crouch, Jump};
     State currentState = State::Idle;
     Time animateSpeed = sf::seconds(1.f/15.);
-    float gravity = -360.f;
+    float gravity = -560.f;
     Animation standAnimate{"dino-01.png", {2, 3, 1, {0, 0, 48, 45}}, animateSpeed};
     Animation crounchAnimate{"dino-02.png", {0, 1, 0, {0, 0, 57, 45}}, animateSpeed};
     Vector2f sBoxSize = {45.f, 45.f};

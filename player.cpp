@@ -5,6 +5,7 @@
 Player::Player() {
     idleState();
     setPosition(pos);
+    speed = 500.f;
 }
 
 void Player::idleState() {
@@ -27,11 +28,15 @@ void Player::JumpState() {
 void Player::update(float dt) {
     if (currentState == State::Jump) {
         pos.y -= speed * dt;
-        speed += gravity * dt;
+        if (pos.y < 290.f) {
+            speed += 3.3f * gravity * dt;
+        } else {
+            speed += gravity * dt;
+        }
         if (pos.y > 317.f) {
             pos.y = 317.f;
             currentState = State::Stand;
-            speed = 200.f;
+            speed = 500.f;
         }
     }
    setPosition(pos);
