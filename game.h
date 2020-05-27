@@ -53,6 +53,7 @@ class Game {
     sf::Text text;
     sf::Font fontGameOver;
     sf::Text textGameOver;
+    sf::Text textPaused;
     unsigned int points = 0;
     unsigned int blinkPoints = 0;
     bool gameover = false;

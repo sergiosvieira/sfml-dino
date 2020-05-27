@@ -27,6 +27,10 @@ public:
      */
     Player();
     /**
+     * @brief standState
+     */
+    void standState();
+    /**
      * @brief DeadState
      */
     void DeadState();

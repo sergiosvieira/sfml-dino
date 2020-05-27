@@ -3,7 +3,7 @@
 #include <set>
 
 Player::Player() {
-    idleState();
+    standState();
     setPosition(pos);
     speed = 500.f;
     buffer.loadFromFile("jump.wav");
@@ -17,6 +17,15 @@ void Player::DeadState() {
     standAnimate.getFrame().updateRect();
     standAnimate.getSprite().setTextureRect(standAnimate.getFrame().getRect());
     freeze();
+}
+
+void Player::standState() {
+    currentState = State::Stand;
+    standAnimate.getFrame().setCurrentFrame(0);
+    standAnimate.setFreeze(false);
+    standAnimate.getFrame().updateRect();
+    standAnimate.getSprite().setTextureRect(standAnimate.getFrame().getRect());
+    pos = {50.f, 317.f};
 }
 
 void Player::idleState() {

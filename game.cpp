@@ -101,6 +101,12 @@ Game::Game(PtrPlayer player) {
                              kHeight/2.f - textGameOver.getGlobalBounds().height/2.f);
     textGameOver.setFillColor(sf::Color(38, 38, 38));
 
+    textPaused.setFont(fontGameOver);
+    textPaused.setString("Press Enter to Start");
+    textPaused.setCharacterSize(15);
+    textPaused.setPosition(kWidth/2.f - textGameOver.getGlobalBounds().width/2.f,
+                             kHeight/2.f - textGameOver.getGlobalBounds().height/2.f);
+    textPaused.setFillColor(sf::Color(38, 38, 38));
 
     std::ostringstream ss;
     ss << std::setw(5) << std::setfill('0') << points << "\n";
@@ -144,7 +150,8 @@ void Game::render(sf::RenderWindow& rw) {
     for (auto object: activatedObjects) {
         if (gameover) object->freeze();
         object->render(rw);
-        if (player != nullptr) {
+        if (player != nullptr
+                && !gameover) {
             sf::FloatRect prect = player->getBox();
             sf::FloatRect orect = {
                 object->getPosition().x,
