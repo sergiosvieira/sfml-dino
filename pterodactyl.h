@@ -25,6 +25,10 @@ public:
      * @param rw
      */
     void render(RenderWindow& rw) override;
+    /**
+     * @brief randomize
+     */
+    void randomize();
 };
 
 #endif // PTERODACTYL_H

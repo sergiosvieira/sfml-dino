@@ -14,6 +14,7 @@ using sf::Texture,
 class Cactus: public Object {
     Texture texture;
     Sprite sprite;
+    IntRect rect;
 public:
     /**
      * @brief Cactus
@@ -34,5 +35,9 @@ public:
      * @param rw
      */
     void render(RenderWindow &rw) override;
+    /**
+     * @brief randomize
+     */
+    void randomize();
 };
 #endif // CACTUS_H
