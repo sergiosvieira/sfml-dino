@@ -23,6 +23,13 @@ using Queue = std::deque<GameEvent>;
  * @brief The Game class
  */
 class Game {
+    int blinkCount = 0;
+    bool showTextScore = true;
+    bool blinking = false;
+    sf::Clock blinkClock;
+    sf::Time blinkElapsed = blinkClock.restart();
+    sf::Time blinkWait = sf::seconds(1.f/4.f);
+
     enum class Level {Easy, Normal, Hard, Hardest};
     Level level = Level::Easy;
     sf::Clock clock, pointClock;
@@ -41,6 +48,7 @@ class Game {
     sf::Font font;
     sf::Text text;
     unsigned int points = 0;
+    unsigned int blinkPoints = 0;
     /**
      * @brief init
      * @param events

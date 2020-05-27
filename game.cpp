@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <algorithm>
+#include <iostream>
 #include <iomanip>
 #include <sstream>
 #include "cloud.h"
@@ -87,10 +88,9 @@ Game::Game() {
     text.setFont(font);
     std::ostringstream ss;
     ss << std::setw(5) << std::setfill('0') << points << "\n";
-    //std::string str = std::string(5, '0').append(std::to_string(points));
     text.setString(ss.str());
     text.setPosition(kWidth - 100.f, 10.f);
-    text.setFillColor(sf::Color(35, 35, 35));
+    text.setFillColor(sf::Color(38, 38, 38));
     text.setCharacterSize(15);
 }
 
@@ -121,17 +121,40 @@ void Game::render(sf::RenderWindow& rw) {
         object->render(rw);
     }
     std::ostringstream ss;
-    ss << std::setw(5) << std::setfill('0') << points << "\n";
+    if (blinking) {
+        ss << std::setw(5) << std::setfill('0') << blinkPoints << "\n";
+    } else {
+        ss << std::setw(5) << std::setfill('0') << points << "\n";
+    }
+    /** Início - Controle de Pontuação **/
+    pointElapsed += pointClock.restart();
+    while (pointElapsed > pointWait) {
+        ++points;
+        if (points % 100 == 0) {
+            blinkPoints = points;
+            blinking = true;
+        }
+        pointElapsed -= pointWait;
+    }
+    blinkElapsed += blinkClock.restart();
+    while (blinkElapsed > blinkWait) {
+        blinkElapsed -= blinkWait;
+        if (blinking) {
+            ++blinkCount;
+            showTextScore = !showTextScore;
+            if (blinkCount >= 8) {
+                blinkCount = 0;
+                blinking = false;
+                showTextScore = true;
+            }
+        }
+    }
+    /** Fim - Controle de Pontuação **/
     text.setString(ss.str());
-    rw.draw(text);
+    if (showTextScore) rw.draw(text);
 }
 
 void Game::update(float dt) {
-    pointElapsed += pointClock.restart();
-    if (pointElapsed > pointWait) {
-        ++points;
-        pointElapsed -= pointWait;
-    }
     for (auto c: clouds) {
         c->update(dt);
     }
