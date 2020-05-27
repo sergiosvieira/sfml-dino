@@ -29,6 +29,11 @@ public:
      * @brief randomize
      */
     void randomize();
+    /**
+     * @brief getSize
+     * @return
+     */
+    Vector2f getSize() override;
 };
 
 #endif // PTERODACTYL_H

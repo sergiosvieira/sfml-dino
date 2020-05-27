@@ -8,7 +8,8 @@
 #include "pterodactyl.h"
 #include "cactus.h"
 
-Game::Game() {
+Game::Game(PtrPlayer player) {
+    this->player = player;
     clouds = {
         PtrObject(new Cloud()),
         PtrObject(new Cloud()),
@@ -84,8 +85,23 @@ Game::Game() {
         {EventType::SmallCactus, sf::seconds(0.2)},
     };
     initGameLevel();
+    buffer.loadFromFile("points.wav");
+    pointsUp.setBuffer(buffer);
+    goBuffer.loadFromFile("gameover.wav");
+    goSound.setBuffer(goBuffer);
+
     font.loadFromFile("atari.ttf");
     text.setFont(font);
+
+    fontGameOver.loadFromFile("atari.ttf");
+    textGameOver.setFont(font);
+    textGameOver.setString("Press Enter to Restart");
+    textGameOver.setCharacterSize(15);
+    textGameOver.setPosition(kWidth/2.f - textGameOver.getGlobalBounds().width/2.f,
+                             kHeight/2.f - textGameOver.getGlobalBounds().height/2.f);
+    textGameOver.setFillColor(sf::Color(38, 38, 38));
+
+
     std::ostringstream ss;
     ss << std::setw(5) << std::setfill('0') << points << "\n";
     text.setString(ss.str());
@@ -126,7 +142,22 @@ void Game::render(sf::RenderWindow& rw) {
     }
     ground.render(rw);
     for (auto object: activatedObjects) {
+        if (gameover) object->freeze();
         object->render(rw);
+        if (player != nullptr) {
+            sf::FloatRect prect = player->getBox();
+            sf::FloatRect orect = {
+                object->getPosition().x,
+                object->getPosition().y,
+                object->getSize().x,
+                object->getSize().y
+            };
+            if (prect.intersects(orect)) {
+                if (!gameover) goSound.play();
+                gameover = true;
+                player->DeadState();
+            }
+        }
     }
     std::ostringstream ss;
     if (blinking) {
@@ -135,39 +166,47 @@ void Game::render(sf::RenderWindow& rw) {
         ss << std::setw(5) << std::setfill('0') << points << "\n";
     }
     /** Início - Controle de Pontuação **/
-    pointElapsed += pointClock.restart();
-    while (pointElapsed > pointWait) {
-        //++points;
-        points += 10;
-        if (points % 100 == 0) {
-            blinkPoints = points;
-            blinking = true;
+    if (!gameover) {
+        pointElapsed += pointClock.restart();
+        while (pointElapsed > pointWait) {
+            ++points;
+            if (points % 100 == 0) {
+                blinkPoints = points;
+                blinking = true;
+                pointsUp.play();
+            }
+            pointElapsed -= pointWait;
         }
-        pointElapsed -= pointWait;
-    }
-    blinkElapsed += blinkClock.restart();
-    while (blinkElapsed > blinkWait) {
-        blinkElapsed -= blinkWait;
-        if (blinking) {
-            ++blinkCount;
-            showTextScore = !showTextScore;
-            if (blinkCount >= 8) {
-                blinkCount = 0;
-                blinking = false;
-                showTextScore = true;
+        blinkElapsed += blinkClock.restart();
+        while (blinkElapsed > blinkWait) {
+            blinkElapsed -= blinkWait;
+            if (blinking) {
+                ++blinkCount;
+                showTextScore = !showTextScore;
+                if (blinkCount >= 8) {
+                    blinkCount = 0;
+                    blinking = false;
+                    showTextScore = true;
+                }
             }
         }
+        /** Fim - Controle de Pontuação **/
+        // Controle do nível de Dificuldade do Jogo
+        if (points > 500 && points < 1000) level = Level::Normal;
+        else if (points > 1000 && points < 5000) level = Level::Hard;
+        else if (points > 5000) level = Level::Hardest;
+        text.setString(ss.str());
     }
-    /** Fim - Controle de Pontuação **/
-    // Controle do nível de Dificuldade do Jogo
-    if (points > 500 && points < 1000) level = Level::Normal;
-    else if (points > 1000 && points < 5000) level = Level::Hard;
-    else if (points > 5000) level = Level::Hardest;
-    text.setString(ss.str());
     if (showTextScore) rw.draw(text);
+    if (gameover) {
+        rw.draw(textGameOver);
+    }
 }
 
 void Game::update(float dt) {
+    if (gameover) {
+        return;
+    }
     for (auto c: clouds) {
         c->update(dt);
     }
@@ -212,4 +251,8 @@ PtrObject Game::process(const GameEvent& event) {
     }
     object->setSpeed(gameSpeed);
     return object;
+}
+
+bool Game::hasGameOver() const {
+    return this->gameover;
 }

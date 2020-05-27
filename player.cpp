@@ -6,6 +6,17 @@ Player::Player() {
     idleState();
     setPosition(pos);
     speed = 500.f;
+    buffer.loadFromFile("jump.wav");
+    jump.setBuffer(buffer);
+}
+
+void Player::DeadState() {
+    currentState = State::Dead;
+    standAnimate.getFrame().setCurrentFrame(4);
+    standAnimate.setFreeze(true);
+    standAnimate.getFrame().updateRect();
+    standAnimate.getSprite().setTextureRect(standAnimate.getFrame().getRect());
+    freeze();
 }
 
 void Player::idleState() {
@@ -59,6 +70,12 @@ void Player::render(RenderWindow& rw) {
     } else if (currentState == State::Jump) {
         JumpState();
     }
+
+//    sf::RectangleShape shape = sf::RectangleShape({getBox().width, getBox().height});
+//    shape.setFillColor(sf::Color::Red);
+//    shape.setPosition(getBox().left, getBox().top);
+//    rw.draw(shape);
+
     if (currentState != State::Crouch) {
         rw.draw(standAnimate.getSprite());
     } else {
@@ -67,10 +84,13 @@ void Player::render(RenderWindow& rw) {
 }
 
 void Player::keyPressed(sf::Event::KeyEvent& key) {
-    if (currentState != State::Jump)
+    if (freeze_) {
+
+    } else if (currentState != State::Jump)
     {
         if (key.code == sf::Keyboard::Up) {
             currentState = State::Jump;
+            jump.play();
         } else if (key.code == sf::Keyboard::Down) {
             currentState = State::Crouch;
         }
@@ -78,6 +98,7 @@ void Player::keyPressed(sf::Event::KeyEvent& key) {
 }
 
 void Player::keyReleased() {
+    if (freeze_) return;
     if (currentState != State::Jump) {
         currentState = State::Stand;
     }
@@ -86,4 +107,11 @@ void Player::keyReleased() {
 void Player::setPosition(const Vector2f& pos) {
     standAnimate.getSprite().setPosition(pos.x, pos.y);
     crounchAnimate.getSprite().setPosition(pos.x, pos.y);
+}
+
+sf::FloatRect Player::getBox() {
+    if (currentState == State::Crouch) {
+        return {getPosition().x + 5.f, getPosition().y + 17.f, cBoxSize.x - 15.f, cBoxSize.y - 5.f};
+    }
+    return {getPosition().x + 10.f, getPosition().y, sBoxSize.x - 15.f, sBoxSize.y - 10.f};
 }

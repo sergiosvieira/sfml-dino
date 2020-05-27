@@ -6,8 +6,10 @@
 #include <memory>
 #include "object.h"
 #include "ground.h"
+#include "player.h"
 
 using PtrObject = std::shared_ptr<Object>;
+using PtrPlayer = std::shared_ptr<Player>;
 using VectorObject = std::vector<PtrObject>;
 
 enum class EventType {None, SmallCactus, BigCactus, Pterodactyl};
@@ -23,6 +25,7 @@ using Queue = std::deque<GameEvent>;
  * @brief The Game class
  */
 class Game {
+    PtrPlayer player = nullptr;
     float gameSpeed = 250.f;
     int blinkCount = 0;
     bool showTextScore = true;
@@ -48,8 +51,13 @@ class Game {
     Ground ground;
     sf::Font font;
     sf::Text text;
+    sf::Font fontGameOver;
+    sf::Text textGameOver;
     unsigned int points = 0;
     unsigned int blinkPoints = 0;
+    bool gameover = false;
+    sf::SoundBuffer buffer, goBuffer;
+    sf::Sound pointsUp, goSound;
     /**
      * @brief init
      * @param events
@@ -69,7 +77,7 @@ public:
     /**
      * @brief Game
      */
-    Game();
+    Game(PtrPlayer player);
     /**
      * @brief render
      * @param rw
@@ -80,6 +88,13 @@ public:
      * @param dt
      */
     void update(float dt);
+    /**
+     * @brief hasGameOver
+     * @return
+     */
+    bool hasGameOver() const;
 };
+
+using PtrGame = std::shared_ptr<Game>;
 
 #endif // GAME_H

@@ -17,18 +17,7 @@
 
 using sf::RenderWindow,
     sf::VideoMode,
-    sf::Event,
-    sf::Color,
-    sf::Vector2f,
-    sf::Font,
-    sf::Text,
-    sf::FloatRect,
-    sf::Time,
-    sf::Clock,
-    sf::Texture,
-    sf::IntRect,
-    sf::Sprite,
-    sf::Vector2i;
+    sf::Event;
 
 using Render = std::function<void(RenderWindow&)>;
 using Update = std::function<void(float)>;
@@ -66,22 +55,30 @@ void loop(RenderWindow& window,
 }
 
 int main() {
-    Game game;
+    PtrPlayer p1 = PtrPlayer(new Player());
+    PtrGame game = PtrGame(new Game(p1));
     sf::RenderWindow window(sf::VideoMode(kWidth, kHeight), "Dino Game");
-    Player p1;
     Update update = [&](float dt) {
-        game.update(dt);
-        p1.update(dt);
+        game->update(dt);
+        p1->update(dt);
     };
     Render render = [&](RenderWindow& rw) {
-        game.render(rw);
-        p1.render(rw);
+        game->render(rw);
+        p1->render(rw);
     };
     KeyPressed keyp = [&](sf::Event::KeyEvent& k) {
-        p1.keyPressed(k);
+        if (game->hasGameOver() &&
+            k.code == sf::Keyboard::Enter) {
+            game = nullptr;
+            p1 = nullptr;
+            p1 = PtrPlayer(new Player());
+            game = PtrGame(new Game(p1));
+        } else {
+            p1->keyPressed(k);
+        }
     };
     KeyReleased keyr = [&]() {
-        p1.keyReleased();
+        p1->keyReleased();
     };
     loop(window, update, render, keyp, keyr);
     return 0;

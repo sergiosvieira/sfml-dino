@@ -21,11 +21,18 @@ void Pterodactyl::update(float dt) {
 }
 
 void Pterodactyl::render(RenderWindow& rw) {
-    animation.update();
+    if (!freeze_) animation.update();
     rw.draw(animation.getSprite());
 }
 
 void Pterodactyl::randomize() {
     int count = floor(nor(mt) * 3);
     pos.y = kHeight - 73.f - (count * 30);
+}
+
+Vector2f Pterodactyl::getSize() {
+    Vector2f result;
+    result.x = animation.getFrame().getRect().width;
+    result.y = animation.getFrame().getRect().height;
+    return result;
 }

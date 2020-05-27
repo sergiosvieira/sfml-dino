@@ -34,3 +34,10 @@ void Cactus::randomize() {
     newRect.width = count * rect.width;
     this->sprite.setTextureRect(newRect);
 }
+
+Vector2f Cactus::getSize() {
+    Vector2f result;
+    result.x = rect.width;
+    result.y = rect.height;
+    return result;
+}

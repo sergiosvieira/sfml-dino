@@ -11,9 +11,11 @@ using sf::Vector2f,
  */
 class Object {
 protected:
+    bool freeze_ = false;
     Vector2f pos = {};
     float speed = 0.f;
     bool canRemove_ = false;
+    Vector2f size = {};
 public:
     /**
      * @brief update
@@ -49,13 +51,31 @@ public:
     void setCanRemove(bool value) {
         this->canRemove_ = value;
     }
-
     /**
      * @brief setSpeed
      * @param speed
      */
     void setSpeed(float speed) {
         this->speed = speed;
+    }
+    /**
+     * @brief getSize
+     * @return
+     */
+    virtual Vector2f getSize() {
+        return this->size;
+    }
+    /**
+     * @brief freeze
+     */
+    void freeze() {
+        this->freeze_ = true;
+    }
+    /**
+     * @brief unfreeze
+     */
+    void unfreeze() {
+        this->freeze_ = false;
     }
 };
 
