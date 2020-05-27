@@ -103,13 +103,15 @@ void Game::update(float dt) {
     ground.update(dt);
     currentTime += clock.restart();
     if (currentTime > queue.front().wait) {
-        GameEvent event = queue.front();
-        if (event.type != EventType::None) {
-            PtrObject object = process(queue.front());
-            if (object != nullptr) activatedObjects.push_back(object);
+        if (queue.size() > 0) {
+            GameEvent event = queue.front();
+            if (event.type != EventType::None) {
+                PtrObject object = process(queue.front());
+                if (object != nullptr) activatedObjects.push_back(object);
+            }
+            currentTime -= queue.front().wait;
+            queue.pop_front();
         }
-        currentTime -= queue.front().wait;
-        queue.pop_front();
     }
     bool erase = false;
     for (auto object: activatedObjects) {
