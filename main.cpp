@@ -6,6 +6,7 @@
 #include <cmath>
 #include <random>
 
+#include "game.h"
 #include "animation.h"
 #include "game-consts.h"
 #include "pterodactyl.h"
@@ -65,25 +66,15 @@ void loop(RenderWindow& window,
 }
 
 int main() {
+    Game game;
     sf::RenderWindow window(sf::VideoMode(kWidth, kHeight), "Dino Game");
-    Cloud c1;
-    Ground ground;
-    Cactus smallCactus{"cactus-small.png", {0, 0, 17, 35}};
-    Cactus bigCactus{"cactus-big.small", {0, 0, 25, 50}};
     Player p1;
-    Pterodactyl ptero;
     Update update = [&](float dt) {
-        c1.update(dt);
-        ground.update(dt);
-        smallCactus.update(dt);
-        ptero.update(dt);
+        game.update(dt);
         p1.update(dt);
     };
     Render render = [&](RenderWindow& rw) {
-        c1.render(rw);
-        ground.render(rw);
-        smallCactus.render(rw);
-        ptero.render(rw);
+        game.render(rw);
         p1.render(rw);
     };
     KeyPressed keyp = [&](sf::Event::KeyEvent& k) {

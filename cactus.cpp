@@ -3,11 +3,12 @@
 #include "game-consts.h"
 
 Cactus::Cactus(const std::string& filename,
-               const IntRect& rect) {
+               const IntRect& rect,
+               float py) {
     this->texture.loadFromFile(filename);
     this->sprite.setTexture(this->texture);
     this->sprite.setTextureRect(rect);
-    pos = {kWidth - 25, static_cast<float>(kHeight - rect.height*2)};
+    pos = {kWidth - 25, py};
     sprite.setPosition(pos);
     speed = 200.f;
 }

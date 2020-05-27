@@ -19,9 +19,11 @@ public:
      * @brief Cactus
      * @param filename
      * @param rect
+     * @param py
      */
     Cactus(const std::string& filename,
-           const IntRect& rect);
+           const IntRect& rect,
+           float py);
     /**
      * @brief update
      * @param dt

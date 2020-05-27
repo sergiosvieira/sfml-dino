@@ -12,6 +12,7 @@ using sf::Texture,
  */
 class Cloud : public Object
 {
+    static const int kFrameWidth = 46;
     Texture texture;
     Sprite sprite;
 public:
@@ -29,6 +30,10 @@ public:
      * @param rw
      */
     void render(RenderWindow& rw) override;
+    /**
+     * @brief randomize
+     */
+    void randomize();
 };
 
 #endif // CLOUD_H

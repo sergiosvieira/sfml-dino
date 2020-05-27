@@ -13,6 +13,7 @@ class Object {
 protected:
     Vector2f pos = {};
     float speed = 0.f;
+    bool canRemove_ = false;
 public:
     /**
      * @brief update
@@ -31,6 +32,24 @@ public:
     virtual void setPosition(const Vector2f& pos) {
         this->pos = pos;
     }
+    /**
+     * @brief getPosition
+     * @return
+     */
+    const Vector2f& getPosition() const {
+        return this->pos;
+    }
+    bool canRemove() const {
+        return this->canRemove_;
+    }
+    /**
+     * @brief setCanRemove
+     * @param value
+     */
+    void setCanRemove(bool value) {
+        this->canRemove_ = value;
+    }
+
     /**
      * @brief setSpeed
      * @param speed
