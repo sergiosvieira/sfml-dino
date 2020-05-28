@@ -10,6 +10,7 @@ SOURCES += \
         cactus.cpp \
         cloud.cpp \
         frame.cpp \
+        game.cpp \
         ground.cpp \
         main.cpp \
         player.cpp \
@@ -22,6 +23,7 @@ HEADERS += \
     frame.h \
     game-consts.h \
     game-random.h \
+    game.h \
     ground.h \
     object.h \
     player.h \
