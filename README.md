@@ -1,4 +1,4 @@
-# Jogo do dinosauro utilizando SFML
+# Jogo do dinossauro utilizando SFML
 
 Este jogo faz parte de um projeto de popularização do desenvolvimento de jogos utilizando C++
 
